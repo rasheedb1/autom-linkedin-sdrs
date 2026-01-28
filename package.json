@@ -1,0 +1,13 @@
+{
+  "name": "cadence-automator",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w apps/api",
+    "build": "npm run build -w apps/api",
+    "start": "npm run start -w apps/api"
+  }
+}
