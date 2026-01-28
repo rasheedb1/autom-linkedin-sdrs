@@ -20,18 +20,28 @@ import { templatesRoutes } from './routes/templates/index.js';
  * Build and configure the Fastify application
  */
 async function buildApp() {
+  // Configure logger based on environment
+  const isDevelopment = process.env.NODE_ENV !== 'production';
+
+  const loggerConfig: any = {
+    level: process.env.LOG_LEVEL || 'info',
+  };
+
+  // Only use pino-pretty in development when it's available
+  if (isDevelopment) {
+    try {
+      require.resolve('pino-pretty');
+      loggerConfig.transport = {
+        target: 'pino-pretty',
+        options: { colorize: true },
+      };
+    } catch {
+      // pino-pretty not installed, use default logger
+    }
+  }
+
   const fastify = Fastify({
-    logger: {
-      level: process.env.LOG_LEVEL || 'info',
-      transport: process.env.NODE_ENV === 'development'
-        ? {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-            },
-          }
-        : undefined,
-    },
+    logger: loggerConfig,
   });
 
   // Register CORS
