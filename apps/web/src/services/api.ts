@@ -1,6 +1,8 @@
 import { supabase } from '@/lib/supabase';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+// When deploying to Vercel, frontend and API are on the same domain
+// Default to empty string (relative URLs) for same-origin deployment
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | undefined>;
@@ -17,7 +19,9 @@ class ApiService {
   }
 
   private buildUrl(path: string, params?: Record<string, string | number | undefined>): string {
-    const url = new URL(`${API_BASE_URL}${path}`);
+    // Handle both absolute URLs (external API) and relative URLs (same domain)
+    const baseUrl = API_BASE_URL || window.location.origin;
+    const url = new URL(`${baseUrl}${path}`);
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -25,6 +29,11 @@ class ApiService {
           url.searchParams.set(key, String(value));
         }
       });
+    }
+
+    // Return relative path for same-origin requests
+    if (!API_BASE_URL) {
+      return `${url.pathname}${url.search}`;
     }
 
     return url.toString();
