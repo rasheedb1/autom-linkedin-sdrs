@@ -34,9 +34,9 @@ export function Settings() {
 
       // Check connection status
       try {
-        const response = await api.get<{ success: boolean; data: ConnectionStatus }>('/api/unipile/status')
-        if (response.success && response.data) {
-          setConnectionStatus(response.data)
+        const response = await api.get<ConnectionStatus>('/api/unipile/status')
+        if (response) {
+          setConnectionStatus(response)
         }
       } catch {
         // Ignore error - user may not be connected
@@ -51,10 +51,10 @@ export function Settings() {
   const handleConnectLinkedIn = async () => {
     setConnecting(true)
     try {
-      const response = await api.post<{ success: boolean; data: { auth_url: string } }>('/api/unipile/connect/linkedin')
-      if (response.success && response.data?.auth_url) {
+      const response = await api.post<{ success: boolean; auth_url: string }>('/api/unipile/connect')
+      if (response.success && response.auth_url) {
         // Open in new window
-        window.open(response.data.auth_url, '_blank', 'width=600,height=700')
+        window.open(response.auth_url, '_blank', 'width=600,height=700')
       }
     } catch (err) {
       console.error('Failed to connect:', err)
@@ -66,9 +66,9 @@ export function Settings() {
   const handleRefreshStatus = async () => {
     setLoading(true)
     try {
-      const response = await api.get<{ success: boolean; data: ConnectionStatus }>('/api/unipile/status')
-      if (response.success && response.data) {
-        setConnectionStatus(response.data)
+      const response = await api.get<ConnectionStatus>('/api/unipile/status')
+      if (response) {
+        setConnectionStatus(response)
       }
     } catch {
       // Ignore
